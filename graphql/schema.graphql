@@ -1,0 +1,100 @@
+type Mutation {
+	changeStatus(mail: String!, status: Int!): User!
+	changeGroup(mail: String!, group: String!): User!
+	changeRole(mail: String!, role: String!): User!
+	resetUsers(mail: String!): User!
+	resetUser(mail: String!, role: String!): User!
+	addUser(
+		mail: String!,
+		admin: Boolean!,
+		group: String!,
+		name: String!,
+		office: String!,
+		role: String!,
+		status: Int!
+	): User!
+	addQuestion(
+		usermail: String!,
+		useroffice: String!,
+		usergroup: String!,
+		question: String!,
+		urgent: Boolean!,
+		category: String!
+	): Question!
+	changeQuestionStatus(id: String!, status: Int!): Question!
+	assignQuestion(id: String!, usermail: String!): Question!
+	addReply(pk: String!, usermail: String!, reply: String!): Reply!
+
+}
+
+type Query {
+	getUser(mail: String!): User!
+	getusersByOffice(office: String!): [User]
+	getusersByrole(role: String!): [User]
+	getusersBygroup(group: String!): [User]
+	users: [User]
+	questions: [Question]
+	listQuestionsByStatus(useroffice: String!, usergroup: String!, status: Int!): [Question]
+	sortquestionsbytimeforsupervisor: [Question]
+}
+
+type Question {
+	pk: String!
+	sk: String!
+	usermail: String!
+	useroffice: String!
+	usergroup: String!
+	ts: String!
+	questionstatus: Int!
+	question: String
+	assigned: String
+	reply: [Reply]
+	urgent: Boolean!
+	category: String!
+	assignee: User
+	author: User!
+}
+
+type Reply {
+	pk: String
+	sk: String!
+	usermail: String!
+	ts: String!
+	reply: String!
+	author: User!
+}
+
+type Subscription {
+	onChangeStatus: User
+		@aws_subscribe(mutations: ["changeStatus"])
+	onChangeGroup: User
+		@aws_subscribe(mutations: ["changeGroup"])
+	onChangeRole: User
+		@aws_subscribe(mutations: ["changeRole"])
+	onAddQuestion: Question
+		@aws_subscribe(mutations: ["addQuestion"])
+	onChangeQuestionStatus: Question
+		@aws_subscribe(mutations: ["changeQuestionStatus"])
+	onAssignQuestion: Question
+		@aws_subscribe(mutations: ["assignQuestion"])
+	onAddReply: Reply
+		@aws_subscribe(mutations: ["addReply"])
+	onAddReplyForGroup(useroffice: String!, usergroup: String!): Reply
+		@aws_subscribe(mutations: ["addReply"])
+}
+
+type User {
+	usermail: String!
+	username: String!
+	userrole: String!
+	userstatus: Int!
+	useroffice: String!
+	usergroup: String!
+	useradmin: Boolean!
+}
+
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+}
